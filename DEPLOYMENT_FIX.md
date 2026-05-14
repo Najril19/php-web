@@ -26,22 +26,41 @@ Solusinya adalah menggunakan `->withProviders()` di `bootstrap/app.php` untuk me
 
 ## Langkah-Langkah di Container/Railway
 
-Setelah deploy ulang, aplikasi seharusnya langsung berjalan. Jika masih ada masalah, jalankan:
+### Opsi 1: Menggunakan Deploy Script (Recommended)
+Jalankan script deployment yang sudah disediakan:
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### Opsi 2: Manual Steps
+Jika masih ada masalah, jalankan langkah-langkah berikut secara manual:
 
 ```bash
 # 1. Pastikan composer dependencies ter-install
 composer install --optimize-autoloader --no-dev
 
-# 2. Generate application key jika belum ada
-php artisan key:generate
+# 2. Buat direktori yang diperlukan
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/framework/cache/data
+mkdir -p storage/logs
+mkdir -p bootstrap/cache
 
-# 3. Clear semua cache
+# 3. Set permissions
+chmod -R 775 storage bootstrap/cache
+
+# 4. Generate application key jika belum ada
+php artisan key:generate --force
+
+# 5. Clear semua cache
 php artisan config:clear
 php artisan cache:clear
 php artisan view:clear
 php artisan route:clear
 
-# 4. Jalankan migrasi jika belum
+# 6. Jalankan migrasi jika belum
 php artisan migrate --force
 ```
 
@@ -53,4 +72,29 @@ Jika masih ada error, cek:
 1. `APP_KEY` sudah di-set di environment variables Railway
 2. `DATABASE_URL` sudah benar
 3. Permissions untuk direktori `storage/` dan `bootstrap/cache/`
-4. Restart deployment di Railway untuk memastikan FrankenPHP worker ter-restart
+4. Semua direktori framework sudah ada:
+   - `storage/framework/sessions`
+   - `storage/framework/views`
+   - `storage/framework/cache/data`
+   - `bootstrap/cache`
+5. Restart deployment di Railway untuk memastikan FrankenPHP worker ter-restart
+
+## Struktur Direktori yang Diperlukan
+
+Pastikan struktur direktori berikut ada:
+```
+bootstrap/
+  cache/
+    .gitignore
+storage/
+  framework/
+    sessions/
+      .gitignore
+    views/
+      .gitignore
+    cache/
+      data/
+        .gitignore
+  logs/
+    .gitignore
+```
