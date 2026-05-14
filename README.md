@@ -19,8 +19,8 @@ php artisan key:generate
 
 Edit `.env`:
 
-- `DB_*` — isi sama dengan `DATABASE_URL` / koneksi yang dipakai app Next (bisa **database yang sama**; migrasi Laravel membuat tabel yang sama persis dengan `db.ts`).
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD` — akun admin seed (default `admin@local.id` / `admin123`).
+- **`DATABASE_URL`** — salin persis dari `mjmscan-next/.env` atau `.env.local` (variabel yang sama dipakai Next lewat `db.ts`). `DB_CONNECTION=pgsql` sudah diset; Laravel membaca URL ini lewat `config/database.php`.
+- **`ADMIN_EMAIL`**, **`ADMIN_PASSWORD`** — sama seperti Next; dipakai seeder admin (default `admin@local.id` / `admin123`).
 - `APP_URL` — URL publik app Laravel.
 
 Jalankan migrasi + seed:
@@ -48,6 +48,7 @@ Sesi disimpan di **session Laravel** (bukan iron-session); perilaku proteksi rou
 
 - **Jangan** commit `.env`.
 - Bisa deploy ke **Railway / VPS** dengan `php artisan serve` atau **Nginx + PHP-FPM** (document root `public/`).
+- **Railway (Railpack):** pastikan `composer.json` mendeklarasikan ekstensi PHP yang dipakai (mis. `ext-gd`, `ext-zip` untuk PhpSpreadsheet, `ext-pdo_pgsql` untuk Postgres) agar ikut terpasang saat build.
 - Export PDF memakai **barryvdh/laravel-dompdf**; Excel memakai **PhpSpreadsheet** (format `.xlsx`).
 
 ## Folder Next asli

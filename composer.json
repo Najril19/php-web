@@ -4,6 +4,9 @@
   "description": "MJMScan+ — Laravel port (same routes & PostgreSQL schema as mjmscan-next)",
   "require": {
     "php": "^8.2",
+    "ext-gd": "*",
+    "ext-zip": "*",
+    "ext-pdo_pgsql": "*",
     "barryvdh/laravel-dompdf": "^3.0",
     "laravel/framework": "^11.31",
     "laravel/tinker": "^2.10",
