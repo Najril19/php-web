@@ -10,6 +10,8 @@
 <div class="grid min-h-screen grid-cols-1 bg-white lg:grid-cols-2">
     {{-- Panel kiri: biru gelap, teks & printer rata tengah --}}
     <div class="relative flex min-h-0 flex-col items-center justify-center overflow-hidden bg-[#1a2b4b] px-8 py-12 text-white sm:px-12 sm:py-16 lg:min-h-screen lg:px-16 lg:py-12">
+        <div class="pointer-events-none absolute inset-0 opacity-30" style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='56' height='56' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M28 6l2 6h6l5-4 4 4-4 5v6l6 2v4l-6 2v6l4 5-4 4-5-4h-6l-2 6h-4l-2-6h-6l-5 4-4-4 4-5v-6l-6-2v-4l6-2v-6l-4-5 4-4 5 4h6l2-6h4z' fill='none' stroke='%23ffffff' stroke-width='0.45' opacity='0.35'/%3E%3C/svg%3E&quot;); background-size: 56px 56px;"></div>
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-blue-600/10 via-transparent to-black/20"></div>
         {{-- Gear icon top-left --}}
         <div class="absolute left-4 top-4 text-white/20 sm:left-6 sm:top-6 lg:left-8 lg:top-8">
             <svg class="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24" fill="currentColor" viewBox="0 0 24 24">
