@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Controllers\User;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class RiwayatController extends Controller
+{
+    public function index(Request $request)
+    {
+        $auth = $request->session()->get('auth');
+        $q = trim((string) $request->query('q', ''));
+        $tingkat = (string) $request->query('tingkat', '');
+
+        $query = DB::table('diagnosa')->where('id_user', $auth['id']);
+
+        if ($q !== '') {
+            $kodeFromNama = DB::table('penyakit')
+                ->where(function ($w) use ($q) {
+                    $w->where('nama_penyakit', 'ilike', '%'.$q.'%')
+                        ->orWhere('kode_penyakit', 'ilike', '%'.$q.'%');
+                })
+                ->pluck('kode_penyakit')
+                ->all();
+            $query->where(function ($w) use ($q, $kodeFromNama) {
+                $w->where('hasil_penyakit', 'ilike', '%'.$q.'%')
+                    ->orWhereRaw('CAST(id AS TEXT) ILIKE ?', ['%'.$q.'%']);
+                if ($kodeFromNama !== []) {
+                    $w->orWhereIn('hasil_penyakit', $kodeFromNama);
+                }
+            });
+        }
+
+        if (in_array($tingkat, ['ringan', 'sedang', 'berat'], true)) {
+            $query->where(function ($w) use ($tingkat) {
+                if ($tingkat === 'berat') {
+                    $w->where('confidence', '>=', 0.8);
+                } elseif ($tingkat === 'sedang') {
+                    $w->where('confidence', '>=', 0.5)->where('confidence', '<', 0.8);
+                } else {
+                    $w->where(function ($inner) {
+                        $inner->whereNull('confidence')->orWhere('confidence', '<', 0.5);
+                    });
+                }
+            });
+        }
+
+        $rows = $query->orderByDesc('tanggal_diagnosa')->get();
+
+        $kodes = $rows->pluck('hasil_penyakit')->filter()->unique()->values()->all();
+        $namaPenyakit = [];
+        if ($kodes !== []) {
+            $namaPenyakit = DB::table('penyakit')->whereIn('kode_penyakit', $kodes)->pluck('nama_penyakit', 'kode_penyakit')->all();
+        }
+
+        return view('user.riwayat.index', [
+            'rows' => $rows,
+            'namaPenyakit' => $namaPenyakit,
+            'notice' => $request->query('notice'),
+            'q' => $q,
+            'tingkat' => $tingkat,
+        ]);
+    }
+
+    public function show(Request $request, int $id)
+    {
+        $auth = $request->session()->get('auth');
+        $d = DB::table('diagnosa')->where('id', $id)->where('id_user', $auth['id'])->first();
+        if (! $d) {
+            abort(404);
+        }
+
+        $penyakit = $d->hasil_penyakit
+            ? DB::table('penyakit')->where('kode_penyakit', $d->hasil_penyakit)->first()
+            : null;
+
+        $kodes = DB::table('diagnosa_detail')->where('id_diagnosa', $id)->pluck('kode_gejala')->all();
+        $namaGejala = [];
+        if ($kodes !== []) {
+            $namaGejala = DB::table('gejala')->whereIn('kode_gejala', $kodes)->pluck('nama_gejala', 'kode_gejala')->all();
+        }
+
+        $pct = $d->confidence !== null ? (float) $d->confidence * 100 : null;
+
+        return view('user.riwayat.show', compact('d', 'penyakit', 'kodes', 'namaGejala', 'pct'));
+    }
+
+    public function destroy(Request $request)
+    {
+        $auth = $request->session()->get('auth');
+        $id = (int) $request->input('id');
+        if (! $id) {
+            return redirect('/user/riwayat');
+        }
+
+        $before = DB::table('diagnosa')->where('id', $id)->where('id_user', $auth['id'])->value('tanggal_diagnosa');
+        DB::table('diagnosa')->where('id', $id)->where('id_user', $auth['id'])->delete();
+
+        $when = $before ? format_date_id((string) $before) : '#'.$id;
+
+        return redirect('/user/riwayat?notice='.urlencode("Riwayat diagnosa tanggal {$when} berhasil dihapus."));
+    }
+}
