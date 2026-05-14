@@ -10,9 +10,17 @@ class PenyakitController extends Controller
 {
     public function index(Request $request)
     {
-        $rows = DB::table('penyakit')->orderBy('kode_penyakit')->get();
+        $q = trim((string) $request->query('q', ''));
+        $builder = DB::table('penyakit');
+        if ($q !== '') {
+            $builder->where(function ($w) use ($q) {
+                $w->where('nama_penyakit', 'ilike', '%'.$q.'%')
+                    ->orWhere('kode_penyakit', 'ilike', '%'.$q.'%');
+            });
+        }
+        $rows = $builder->orderBy('kode_penyakit')->get();
         $editing = $request->query('edit')
-            ? $rows->firstWhere('kode_penyakit', $request->query('edit'))
+            ? DB::table('penyakit')->where('kode_penyakit', $request->query('edit'))->first()
             : null;
 
         return view('admin.penyakit.index', [
@@ -21,6 +29,7 @@ class PenyakitController extends Controller
             'success' => $request->query('success'),
             'notice' => $request->query('notice'),
             'error' => $request->query('error'),
+            'q' => $q,
         ]);
     }
 

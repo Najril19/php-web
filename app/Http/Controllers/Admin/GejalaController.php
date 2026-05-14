@@ -10,9 +10,17 @@ class GejalaController extends Controller
 {
     public function index(Request $request)
     {
-        $rows = DB::table('gejala')->orderBy('kode_gejala')->get();
+        $q = trim((string) $request->query('q', ''));
+        $builder = DB::table('gejala');
+        if ($q !== '') {
+            $builder->where(function ($w) use ($q) {
+                $w->where('nama_gejala', 'ilike', '%'.$q.'%')
+                    ->orWhere('kode_gejala', 'ilike', '%'.$q.'%');
+            });
+        }
+        $rows = $builder->orderBy('kode_gejala')->get();
         $editing = $request->query('edit')
-            ? $rows->firstWhere('kode_gejala', $request->query('edit'))
+            ? DB::table('gejala')->where('kode_gejala', $request->query('edit'))->first()
             : null;
 
         return view('admin.gejala.index', [
@@ -21,6 +29,7 @@ class GejalaController extends Controller
             'success' => $request->query('success'),
             'notice' => $request->query('notice'),
             'error' => $request->query('error'),
+            'q' => $q,
         ]);
     }
 

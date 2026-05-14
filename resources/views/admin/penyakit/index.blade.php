@@ -1,11 +1,12 @@
 @extends('layouts.dashboard')
 @section('title', 'Data Kerusakan')
 @section('content')
+@php $q = $q ?? ''; @endphp
 <div class="mx-auto max-w-6xl space-y-6">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">Data Kerusakan</h1>
-            <p class="mt-1 text-sm text-slate-500">Master jenis kerusakan (penyakit).</p>
+            <h1 class="text-2xl font-bold tracking-tight text-[#152238] sm:text-3xl">Data Kerusakan</h1>
+            <p class="mt-1 text-[15px] text-slate-600">Kelola data jenis kerusakan pada printer.</p>
         </div>
     </div>
     @if (request('success'))
@@ -18,78 +19,100 @@
         <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900">{{ request('error') }}</div>
     @endif
 
-    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 class="text-lg font-semibold text-slate-900">+ Tambah kerusakan</h2>
-        <form method="post" action="/admin/penyakit" class="mt-6 grid gap-4 md:grid-cols-2">
-            @csrf
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Kode</label>
-                <input name="kode_penyakit" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20">
+    <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_4px_24px_rgba(15,23,42,0.06)] sm:p-6">
+        <form method="get" action="/admin/penyakit" class="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div class="relative min-w-0 flex-1">
+                <i class="bi bi-search pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="search" name="q" value="{{ $q }}" placeholder="Cari kerusakan…"
+                       class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20">
             </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Nama</label>
-                <input name="nama_penyakit" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20">
-            </div>
-            <div class="md:col-span-2">
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Deskripsi</label>
-                <textarea name="deskripsi" rows="2" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"></textarea>
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Solusi</label>
-                <textarea name="solusi" rows="2" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"></textarea>
-            </div>
-            <div>
-                <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Pencegahan</label>
-                <textarea name="pencegahan" rows="2" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"></textarea>
-            </div>
-            <div class="md:col-span-2">
-                <button type="submit" class="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700">Simpan</button>
-            </div>
+            <button type="submit" class="rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-brand-700">Cari</button>
+            @if ($q !== '')
+                <a href="/admin/penyakit" class="rounded-xl border border-slate-200 px-5 py-3 text-center text-sm font-semibold text-slate-600 hover:bg-slate-50">Reset</a>
+            @endif
         </form>
     </div>
 
+    <details class="group rounded-2xl border border-slate-200/90 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.06)]" @if (! $editing) open @endif>
+        <summary class="cursor-pointer list-none rounded-2xl px-5 py-4 font-bold text-[#152238] marker:content-none sm:px-6 sm:py-5 [&::-webkit-details-marker]:hidden">
+            <span class="inline-flex items-center gap-2"><i class="bi bi-plus-circle text-brand-600"></i> Tambah kerusakan</span>
+            <span class="float-right text-sm font-normal text-slate-500 group-open:hidden">Buka form</span>
+            <span class="float-right hidden text-sm font-normal text-slate-500 group-open:inline">Tutup</span>
+        </summary>
+        <div class="border-t border-slate-100 px-5 pb-6 pt-2 sm:px-6">
+            <form method="post" action="/admin/penyakit" class="grid gap-4 md:grid-cols-2">
+                @csrf
+                <div>
+                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Kode</label>
+                    <input name="kode_penyakit" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20">
+                </div>
+                <div>
+                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Nama</label>
+                    <input name="nama_penyakit" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Deskripsi</label>
+                    <textarea name="deskripsi" rows="2" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"></textarea>
+                </div>
+                <div>
+                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Solusi</label>
+                    <textarea name="solusi" rows="2" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"></textarea>
+                </div>
+                <div>
+                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Pencegahan</label>
+                    <textarea name="pencegahan" rows="2" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"></textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" class="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-brand-700">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </details>
+
     @if ($editing)
-        <div class="rounded-2xl border border-amber-200 bg-amber-50/50 p-6 shadow-sm">
-            <h2 class="text-lg font-semibold text-amber-950">Edit {{ $editing->kode_penyakit }}</h2>
+        <div class="rounded-2xl border border-amber-200 bg-amber-50/60 p-6 shadow-sm">
+            <h2 class="text-lg font-bold text-amber-950">Edit {{ $editing->kode_penyakit }}</h2>
             <form method="post" action="/admin/penyakit/update" class="mt-4 grid gap-4 md:grid-cols-2">
                 @csrf
                 <input type="hidden" name="kode_penyakit" value="{{ $editing->kode_penyakit }}">
                 <div class="md:col-span-2">
-                    <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Nama</label>
+                    <label class="mb-1.5 block text-xs font-bold uppercase text-slate-500">Nama</label>
                     <input name="nama_penyakit" required value="{{ $editing->nama_penyakit }}" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm">
                 </div>
                 <div class="md:col-span-2">
-                    <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Deskripsi</label>
+                    <label class="mb-1.5 block text-xs font-bold uppercase text-slate-500">Deskripsi</label>
                     <textarea name="deskripsi" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm">{{ $editing->deskripsi }}</textarea>
                 </div>
                 <div>
-                    <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Solusi</label>
+                    <label class="mb-1.5 block text-xs font-bold uppercase text-slate-500">Solusi</label>
                     <textarea name="solusi" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm">{{ $editing->solusi }}</textarea>
                 </div>
                 <div>
-                    <label class="mb-1 block text-xs font-semibold uppercase text-slate-500">Pencegahan</label>
+                    <label class="mb-1.5 block text-xs font-bold uppercase text-slate-500">Pencegahan</label>
                     <textarea name="pencegahan" rows="2" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm">{{ $editing->pencegahan }}</textarea>
                 </div>
-                <div class="md:col-span-2">
-                    <button type="submit" class="rounded-xl bg-amber-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-amber-700">Update</button>
+                <div class="md:col-span-2 flex flex-wrap gap-2">
+                    <button type="submit" class="rounded-xl bg-amber-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-amber-700">Update</button>
+                    <a href="/admin/penyakit{{ $q !== '' ? '?q='.urlencode($q) : '' }}" class="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Batal</a>
                 </div>
             </form>
         </div>
     @endif
 
-    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto rounded-2xl border border-slate-200/90 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.06)]">
         <table class="w-full min-w-[560px] text-sm">
-            <thead class="border-b border-slate-100 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                <tr><th class="px-4 py-3">No</th><th class="px-4 py-3">Kode</th><th class="px-4 py-3">Nama kerusakan</th><th class="px-4 py-3 text-right">Aksi</th></tr>
+            <thead class="border-b border-slate-200 bg-slate-100/90 text-left text-xs font-bold uppercase tracking-wide text-slate-600">
+                <tr><th class="px-4 py-3.5">No</th><th class="px-4 py-3.5">Kode</th><th class="px-4 py-3.5">Nama kerusakan</th><th class="px-4 py-3.5 text-right">Aksi</th></tr>
             </thead>
             <tbody>
-                @foreach ($rows as $i => $row)
-                    <tr class="border-t border-slate-100">
-                        <td class="px-4 py-3 text-slate-500">{{ $i + 1 }}</td>
-                        <td class="px-4 py-3 font-mono text-xs text-slate-600">{{ $row->kode_penyakit }}</td>
-                        <td class="px-4 py-3 font-medium text-slate-900">{{ $row->nama_penyakit }}</td>
-                        <td class="px-4 py-3 text-right">
-                            <a href="/admin/penyakit?edit={{ urlencode($row->kode_penyakit) }}" class="mr-3 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-brand-600 hover:bg-slate-50" title="Edit"><i class="bi bi-pencil"></i></a>
+                @forelse ($rows as $i => $row)
+                    <tr class="border-t border-slate-100 odd:bg-white even:bg-slate-50/80">
+                        <td class="px-4 py-3.5 text-slate-500">{{ $i + 1 }}</td>
+                        <td class="px-4 py-3.5 font-mono text-xs text-slate-600">{{ $row->kode_penyakit }}</td>
+                        <td class="px-4 py-3.5 font-medium text-slate-900">{{ $row->nama_penyakit }}</td>
+                        <td class="px-4 py-3.5 text-right">
+                            @php $eq = $q !== '' ? '&q='.urlencode($q) : ''; @endphp
+                            <a href="/admin/penyakit?edit={{ urlencode($row->kode_penyakit) }}{{ $eq }}" class="mr-2 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-brand-600 hover:bg-blue-50" title="Edit"><i class="bi bi-pencil"></i></a>
                             <form method="post" action="/admin/penyakit/hapus" class="inline" onsubmit="return confirm('Hapus?');">
                                 @csrf
                                 <input type="hidden" name="kode_penyakit" value="{{ $row->kode_penyakit }}">
@@ -97,7 +120,9 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr><td colspan="4" class="px-4 py-12 text-center text-slate-500">Tidak ada data.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>

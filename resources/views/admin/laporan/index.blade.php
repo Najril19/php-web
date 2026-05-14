@@ -8,8 +8,8 @@
 @endphp
 <div class="mx-auto max-w-3xl space-y-6">
     <div>
-        <h1 class="text-2xl font-bold text-slate-900">Laporan Diagnosa</h1>
-        <p class="mt-1 text-sm text-slate-500">Unduh rekapitulasi periode tertentu.</p>
+        <h1 class="text-2xl font-bold tracking-tight text-[#152238] sm:text-3xl">Laporan Diagnosa</h1>
+        <p class="mt-1 text-[15px] text-slate-600">Unduh rekapitulasi periode tertentu.</p>
     </div>
     <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <p class="mb-6 text-sm text-slate-600">Pilih periode lalu unduh PDF atau Excel.</p>

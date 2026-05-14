@@ -10,7 +10,53 @@ class RiwayatController extends Controller
 {
     public function index(Request $request)
     {
-        $rows = DB::table('diagnosa')->orderByDesc('tanggal_diagnosa')->get();
+        $q = trim((string) $request->query('q', ''));
+        $tingkat = (string) $request->query('tingkat', '');
+
+        $query = DB::table('diagnosa');
+
+        if ($q !== '') {
+            $kodeFromNama = DB::table('penyakit')
+                ->where(function ($w) use ($q) {
+                    $w->where('nama_penyakit', 'ilike', '%'.$q.'%')
+                        ->orWhere('kode_penyakit', 'ilike', '%'.$q.'%');
+                })
+                ->pluck('kode_penyakit')
+                ->all();
+            $userIdsMatch = DB::table('users')
+                ->where(function ($w) use ($q) {
+                    $w->where('nama_lengkap', 'ilike', '%'.$q.'%')
+                        ->orWhere('email', 'ilike', '%'.$q.'%');
+                })
+                ->pluck('id')
+                ->all();
+            $query->where(function ($w) use ($q, $kodeFromNama, $userIdsMatch) {
+                $w->whereRaw('CAST(id AS TEXT) ILIKE ?', ['%'.$q.'%'])
+                    ->orWhere('hasil_penyakit', 'ilike', '%'.$q.'%');
+                if ($kodeFromNama !== []) {
+                    $w->orWhereIn('hasil_penyakit', $kodeFromNama);
+                }
+                if ($userIdsMatch !== []) {
+                    $w->orWhereIn('id_user', $userIdsMatch);
+                }
+            });
+        }
+
+        if (in_array($tingkat, ['ringan', 'sedang', 'berat'], true)) {
+            $query->where(function ($w) use ($tingkat) {
+                if ($tingkat === 'berat') {
+                    $w->where('confidence', '>=', 0.8);
+                } elseif ($tingkat === 'sedang') {
+                    $w->where('confidence', '>=', 0.5)->where('confidence', '<', 0.8);
+                } else {
+                    $w->where(function ($inner) {
+                        $inner->whereNull('confidence')->orWhere('confidence', '<', 0.5);
+                    });
+                }
+            });
+        }
+
+        $rows = $query->orderByDesc('tanggal_diagnosa')->get();
 
         $userIds = $rows->pluck('id_user')->unique()->filter()->values()->all();
         $namaUser = [];
@@ -29,6 +75,8 @@ class RiwayatController extends Controller
             'namaUser' => $namaUser,
             'namaPenyakit' => $namaPenyakit,
             'notice' => $request->query('notice'),
+            'q' => $q,
+            'tingkat' => $tingkat,
         ]);
     }
 

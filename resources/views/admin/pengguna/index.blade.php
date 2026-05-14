@@ -3,8 +3,8 @@
 @section('content')
 <div class="mx-auto max-w-6xl space-y-6">
     <div>
-        <h1 class="text-2xl font-bold text-slate-900">Data Pengguna</h1>
-        <p class="mt-1 text-sm text-slate-500">Akun admin dan pengguna aplikasi.</p>
+        <h1 class="text-2xl font-bold tracking-tight text-[#152238] sm:text-3xl">Data Pengguna</h1>
+        <p class="mt-1 text-[15px] text-slate-600">Akun admin dan pengguna aplikasi.</p>
     </div>
     @if (request('success'))<div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">Berhasil.</div>@endif
     @if (request('notice'))<div class="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">{{ request('notice') }}</div>@endif

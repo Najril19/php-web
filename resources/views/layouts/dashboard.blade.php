@@ -15,8 +15,8 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
                     colors: {
-                        navy: { DEFAULT: '#1a2b4b', 950: '#0f172a' },
-                        sidebar: '#1a2b4b',
+                        navy: { DEFAULT: '#152238', 950: '#0a1628' },
+                        sidebar: '#152238',
                         brand: { 600: '#2563eb', 700: '#1d4ed8' },
                     },
                 },
@@ -43,7 +43,13 @@
                 </div>
             </header>
 
-            <main class="main-scroll min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8 lg:px-10 lg:py-10 print:ml-0 print:w-full print:overflow-visible print:p-6">
+            <main class="main-scroll min-h-0 min-w-0 flex-1 overflow-y-auto bg-slate-100/80 px-4 py-4 sm:px-5 sm:py-6 md:px-8 md:py-8 lg:px-10 lg:py-10 print:ml-0 print:w-full print:overflow-visible print:bg-white print:p-6">
+                <div class="mb-5 flex justify-end print:hidden">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white px-4 py-2 text-xs font-medium text-slate-600 shadow-sm sm:text-sm">
+                        <i class="bi bi-calendar3 text-slate-400"></i>
+                        <span id="toolbar-datetime-text"></span>
+                    </span>
+                </div>
                 @yield('content')
             </main>
         </div>
@@ -100,6 +106,19 @@
                 if (e.key === 'Escape' && !isDesktop()) setOpen(false);
             });
             if (isDesktop()) sidebar.classList.remove('-translate-x-full');
+        })();
+        (function () {
+            var el = document.getElementById('toolbar-datetime-text');
+            if (!el) return;
+            function fmt() {
+                var d = new Date();
+                var months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                var dd = d.getDate(), mm = months[d.getMonth()], yy = d.getFullYear();
+                var hh = String(d.getHours()).padStart(2, '0'), mi = String(d.getMinutes()).padStart(2, '0');
+                el.textContent = dd + ' ' + mm + ' ' + yy + ' | ' + hh + ':' + mi;
+            }
+            fmt();
+            setInterval(fmt, 30000);
         })();
     </script>
     @stack('scripts')

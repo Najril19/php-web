@@ -14,7 +14,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-                    colors: { navy: { DEFAULT: '#1a2b4b', 950: '#0f172a' }, sidebar: '#1a2b4b', brand: { 600: '#2563eb', 700: '#1d4ed8' } },
+                    colors: { navy: { DEFAULT: '#152238', 950: '#0a1628' }, sidebar: '#152238', brand: { 600: '#2563eb', 700: '#1d4ed8' } },
                 },
             },
         };
