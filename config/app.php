@@ -18,7 +18,7 @@ return [
     | UI branding (subtitle under page titles & login)
     |--------------------------------------------------------------------------
     */
-    'tagline' => env('APP_TAGLINE', 'Sistem pakar diagnosa kerusakan printer — metode Forward Chaining'),
+    'tagline' => env('APP_TAGLINE', 'Diagnosa Kerusakan Printer pada Fotocopy Berkah Andirra'),
 
     /*
     |--------------------------------------------------------------------------
